@@ -1,5 +1,5 @@
 # Define the Go source file and the output binary name
-SRC = tf.go
+SRC = main.go
 BINARY = tf
 
 # Determine the OS and architecture
