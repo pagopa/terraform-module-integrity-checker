@@ -50,10 +50,9 @@ jobs:
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          tag: ${{ github.ref_name }}
-        files:
-          - release/tf-linux
-          - release/tf-macos
-          - release/tf.exe
+          files: |
+            release/tf-linux
+            release/tf-macos
+            release/tf.exe
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
