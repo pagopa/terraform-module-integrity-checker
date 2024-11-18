@@ -38,7 +38,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v2
         with:
-          go-version: '1.20'  # Specify the Go version you want to use
+          go-version: '1.23.2''  # Specify the Go version you want to use
 
       - name: Build binaries for different OS
         run: |
