@@ -7,7 +7,7 @@ OS := $(shell uname | tr '[:upper:]' '[:lower:]')
 ARCH := $(shell uname -m)
 
 # Define the output directory for installation
-INSTALL_DIR = /usr/local/bin
+INSTALL_DIR = ~/bin
 
 # Build for the current platform
 build:
@@ -28,8 +28,8 @@ build-windows:
 # Install the binary for the current platform
 install:
 	@echo "Installing $(BINARY) to $(INSTALL_DIR)"
-	@sudo cp $(BINARY) $(INSTALL_DIR)
-	@sudo chmod +x $(INSTALL_DIR)/$(BINARY)
+	cp $(BINARY) $(INSTALL_DIR)
+	chmod +x $(INSTALL_DIR)/$(BINARY)
 
 # Clean up the generated binaries
 clean:

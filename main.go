@@ -42,13 +42,24 @@ func main() {
 		os.Exit(1)
 	}
 
-	// Download modules
-	cmd := exec.Command("terraform", append([]string{action}, os.Args[2:]...)...)
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	if err := cmd.Run(); err != nil {
-		fmt.Printf("Error running terraform: %v\n", err)
-		os.Exit(1)
+	/* if the action is apply run the plan before and ask for approval before running the apply */
+	if action == "apply" {
+		action = " plan -out /tmp/tfplan.out"
+		runTerraform("plan", []string{"--out", "/tmp/tfplan.out"})
+
+		var approve string
+
+		fmt.Print("Apply changes (Yes/No)? ")
+		fmt.Scan(&approve)
+
+		if approve == "Yes" {
+			runTerraform("apply", append([]string{"--auto-approve", "/tmp/tfplan.out"}, os.Args[2:]...))
+		} else {
+			os.Exit(0)
+		}
+
+	} else {
+		runTerraform(action, os.Args[2:])
 	}
 
 	if action == "init" {
@@ -76,9 +87,6 @@ func main() {
 						fmt.Printf("%sThe module %s has been changed!%s\n", red, moduleName, nc)
 						os.Exit(-1)
 					}
-				} else {
-					// Save new hash if no previous hash exists
-					// fmt.Printf("Salvataggio del nuovo hash del modulo %s.\n", moduleName)
 				}
 
 				// Update the hash store
@@ -90,6 +98,18 @@ func main() {
 		if err := saveHashes(hashesFile, hashStore); err != nil {
 			fmt.Printf("Error saving hashes: %v\n", err)
 		}
+	}
+}
+
+func runTerraform(action string, params []string) {
+
+	cmd := exec.Command("terraform", append([]string{action}, params...)...)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+
+	if err := cmd.Run(); err != nil {
+		fmt.Printf("Error running terraform: %v\n", err)
+		os.Exit(1)
 	}
 }
 
