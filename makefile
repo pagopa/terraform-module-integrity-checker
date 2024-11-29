@@ -6,9 +6,6 @@ BINARY = tf
 OS := $(shell uname | tr '[:upper:]' '[:lower:]')
 ARCH := $(shell uname -m)
 
-# Define the output directory for installation
-INSTALL_DIR = ~/bin
-
 # Build for the current platform
 build:
 	go build -o $(BINARY) $(SRC)
@@ -26,10 +23,8 @@ build-windows:
 	GOOS=windows GOARCH=amd64 go build -o $(BINARY).exe $(SRC)
 
 # Install the binary for the current platform
-install:
-	@echo "Installing $(BINARY) to $(INSTALL_DIR)"
-	cp $(BINARY) $(INSTALL_DIR)
-	chmod +x $(INSTALL_DIR)/$(BINARY)
+install: build
+	go install
 
 # Clean up the generated binaries
 clean:

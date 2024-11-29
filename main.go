@@ -2,10 +2,10 @@ package main
 
 import (
 	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/fs"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -17,7 +17,7 @@ const (
 	modulesDir          = ".terraform/modules"
 	modulesMetadataFile = ".terraform/modules/modules.json"
 	registryURL         = "registry.terraform.io"
-	hashesFile          = "tfmodules.lock.json"
+	hashesFile          = ".module_hashes.json"
 )
 
 type ModulesMetadata struct {
@@ -117,9 +117,7 @@ func handleInit() error {
 
 		moduleName := filepath.Base(modulePath)
 		if previousHash, exists := hashes[moduleName]; exists {
-			if previousHash == newHash {
-				fmt.Printf("The module %s has not changed.\n", moduleName)
-			} else {
+			if previousHash != newHash {
 				fmt.Printf("The module %s has changed! Exiting...\n", moduleName)
 				return errors.New("hash consistency check failed")
 			}
@@ -144,28 +142,43 @@ func handleInit() error {
 	return nil
 }
 
+// isHidden checks if a file or directory is hidden (starts with a dot)
+func isHidden(name string) bool {
+	return len(name) > 0 && name[0] == '.'
+}
+
 func calculateHash(path string) (string, error) {
+
 	hasher := sha256.New()
-	err := filepath.Walk(path, func(filePath string, info fs.FileInfo, err error) error {
+
+	err := filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
-		}
-		if info.IsDir() {
-			return nil
 		}
 
-		content, err := ioutil.ReadFile(filePath)
-		if err != nil {
-			return err
+		// Skip hidden directories
+		if info.IsDir() && isHidden(info.Name()) {
+			return filepath.SkipDir
 		}
-		hasher.Write(content)
+
+		// If it's a file, read its contents and update the hash
+		if !info.IsDir() {
+			data, err := ioutil.ReadFile(path)
+			if err != nil {
+				return err
+			}
+			hasher.Write(data)
+		}
+
 		return nil
 	})
 
 	if err != nil {
 		return "", err
 	}
-	return fmt.Sprintf("%x", hasher.Sum(nil)), nil
+
+	hash := hasher.Sum(nil)
+	return hex.EncodeToString(hash), nil
 }
 
 func writeLockFile(filename string, hashes map[string]string) error {
