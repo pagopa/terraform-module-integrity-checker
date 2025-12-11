@@ -48,6 +48,26 @@ Run the application with the desired Terraform action as the first argument, fol
 - `apply`: Applies the changes required to reach the desired state of the configuration.
 - `plan`: Creates an execution plan, showing what actions Terraform will take.
 
+---
+## Repository Structure & Details (Auto-generated)
+
+### Scopo
+Fornisce un tool CLI per verificare integrità e provenienza dei moduli Terraform (supply chain security) prima del deploy; riduce rischio di dipendenze compromesse.
+
+### Cartelle
+- `main.go`: implementazione CLI.
+- `makefile`: target `build`, `install`.
+
+### Script
+- `main.go`: implementazione CLI.
+- `make build|install`: build e installazione.
+
+### Workflow
+- `go-build-and-release.yml`: build e release.
+
+### Note
+Usare in CI o pre-commit per garantire lockfile affidabili.
+
 ### Example
 
 To initialize a Terraform configuration and check for module integrity:

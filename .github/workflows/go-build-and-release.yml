@@ -1,3 +1,4 @@
+# Scopo: build e release
 name: Go Build and Release
 
 on:

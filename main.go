@@ -1,5 +1,5 @@
 package main
-
+// Scopo: implementazione CLI per verifica integrità moduli Terraform
 import (
 	"crypto/sha256"
 	"encoding/hex"
